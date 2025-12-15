@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Houseland India | Find Your Dream Home</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans for that modern, friendly, geometric look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        'brand-dark': '#0F172A',      /* Deep Navy/Slate instead of pure black */
+                        'brand-gray': '#F1F5F9',      /* Cool gray */
+                        'brand-blue': '#2563EB',      /* Primary Royal Blue */
+                        'brand-blue-dark': '#1E40AF', /* Darker interaction blue */
+                        'brand-light': '#EFF6FF',     /* Very light blue tint for backgrounds */
+                    },
+                    borderRadius: {
+                        '3xl': '1.5rem',
+                        '4xl': '2rem',
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(15, 23, 42, 0.05)',
+                        'floating': '0 20px 60px -15px rgba(15, 23, 42, 0.1)',
+                        'blue-glow': '0 10px 40px -10px rgba(37, 99, 235, 0.25)', /* Custom Blue Shadow */
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #0F172A; /* Brand Dark */
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Hide Scrollbar for clean UI */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        /* View Transitions */
+        .view-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+        }
+        .view-section.active {
+            display: block;
+            opacity: 1;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Nav Link Active State */
+        .nav-pill {
+            transition: all 0.3s ease;
+        }
+        .nav-pill.active {
+            background-color: #2563EB; /* Brand Blue */
+            color: white;
+        }
+
+        /* Custom Card Hover */
+        .property-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .property-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -5px rgba(15, 23, 42, 0.1);
+        }
+        
+        /* Dropdown Animation Styles */
+        .dropdown-menu {
+            transform-origin: top center;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            /* Custom Blue Shadow Added Here */
+            box-shadow: 0 20px 40px -10px rgba(37, 99, 235, 0.2), 0 0 15px rgba(37, 99, 235, 0.1); 
+        }
+        .dropdown-menu.open {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(100%) translateY(0);
+        }
+        .dropdown-menu.closed {
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(95%) translateY(-10px);
+        }
+        
+        /* Chevron Rotation */
+        .chevron {
+            transition: transform 0.3s ease;
+        }
+        .group.active .chevron {
+            transform: rotate(180deg);
+        }
+
+        /* MVP Badge Animation */
+        .mvp-badge {
+            animation: pulse-gold 2s infinite;
+        }
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(234, 179, 8, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
+        }
+    </style>
+</head>
+<body class="bg-white">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#home" onclick="navigateTo('home')" class="text-2xl font-bold tracking-tight text-brand-dark">Houseland<span class="text-brand-blue">.in</span></a>
+            
+            <!-- Center Links (Hidden on Mobile) -->
+            <div class="hidden md:flex bg-brand-gray rounded-full p-1.5 gap-1">
+                <button onclick="navigateTo('home')" class="nav-pill active px-6 py-2 rounded-full text-sm font-semibold text-gray-600 hover:text-brand-dark">Home</button>
+                <button onclick="navigateTo('listings')" class="nav-pill px-6 py-2 rounded-full text-sm font-semibold text-gray-600 hover:text-brand-dark">Listings</button>
+                <button onclick="navigateTo('projects')" class="nav-pill px-6 py-2 rounded-full text-sm font-semibold text-gray-600 hover:text-brand-dark">Projects</button>
+                <button onclick="navigateTo('services')" class="nav-pill px-6 py-2 rounded-full text-sm font-semibold text-gray-600 hover:text-brand-dark">Services</button>
+                <button onclick="navigateTo('contact')" class="nav-pill px-6 py-2 rounded-full text-sm font-semibold text-gray-600 hover:text-brand-dark">Agents</button>
+            </div>
+
+            <!-- CTA -->
+            <button onclick="navigateTo('contact')" class="bg-brand-blue text-white px-4 md:px-6 py-2 md:py-3 rounded-full text-xs md:text-sm font-semibold hover:bg-brand-blue-dark transition-colors shadow-lg shadow-blue-200">
+                Contact Us
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="pt-24 min-h-screen">
+
+        <!-- ==================== PAGE 1: HOME ==================== -->
+        <section id="home" class="view-section active">
+            <!-- Hero Section -->
+            <div class="max-w-7xl mx-auto px-4 md:px-6 mb-24 relative z-20">
+                <div class="relative min-h-[600px] md:h-[600px] group">
+                    <div class="absolute inset-0 rounded-3xl overflow-hidden shadow-2xl">
+                        <div class="absolute inset-0 bg-blue-900/40 z-10"></div>
+                        <img src="https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2600&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700 relative z-0" alt="Modern House">
+                    </div>
+                    <div class="relative h-full flex flex-col justify-center items-center text-center text-white px-4 z-20 py-12 md:py-0">
+                        <h1 class="text-4xl md:text-7xl font-bold mb-6 tracking-tight leading-tight drop-shadow-lg">Find Your Dream <br class="hidden md:block"> Home in India</h1>
+                        <p class="text-blue-50 max-w-xl text-base md:text-lg mb-8 md:mb-12 drop-shadow-md">Explore premium flats, villas, and plots across Mumbai, Bangalore, and Delhi tailored to your lifestyle.</p>
+                        <div class="bg-white p-4 rounded-3xl md:rounded-full shadow-blue-glow flex flex-col md:flex-row items-center gap-2 md:gap-4 max-w-sm md:max-w-4xl w-full text-left animate-bounce-in relative z-50 border border-gray-200">
+                            <!-- Dropdown 1: Type -->
+                            <div class="relative flex-1 px-2 md:px-4 border-b md:border-b-0 md:border-r border-gray-200 w-full md:w-auto custom-dropdown pb-2 md:pb-0">
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Type</label>
+                                <button class="dropdown-trigger w-full text-left font-bold text-gray-800 bg-transparent flex justify-between items-center group py-2 md:py-0">
+                                    <span class="selected-text truncate">3 BHK Apartment</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-brand-blue chevron ml-2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                                </button>
+                                <div class="dropdown-menu closed absolute top-full left-0 mt-2 md:mt-4 w-full md:w-56 bg-white rounded-2xl border border-gray-200 overflow-hidden z-50 p-2">
+                                    <div class="dropdown-item px-4 py-2 hover:bg-brand-light hover:text-brand-blue rounded-xl cursor-pointer transition-colors font-medium text-sm text-gray-600">3 BHK Apartment</div>
+                                    <div class="dropdown-item px-4 py-2 hover:bg-brand-light hover:text-brand-blue rounded-xl cursor-pointer transition-colors font-medium text-sm text-gray-600">Villa / Bungalow</div>
+                                    <div class="dropdown-item px-4 py-2 hover:bg-brand-light hover:text-brand-blue rounded-xl cursor-pointer transition-colors font-medium text-sm text-gray-600">Penthouse</div>
+                                    <div class="dropdown-item px-4 py-2 hover:bg-brand-light hover:text-brand-blue rounded-xl cursor-pointer transition-colors font-medium text-sm text-gray-600">Studio</div>
+                                </div>
+                            </div>
+                            <!-- Dropdown 2: Location -->
+                            <div class="relative flex-1 px-2 md:px-4 border-b md:border-b-0 md:border-r border-gray-200 w-full md:w-auto custom-dropdown pb-2 md:pb-0">
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Location</label>
+                                <button class="dropdown-trigger w-full text-left font-bold text-gray-800 bg-transparent flex justify-between items-center group py-2 md:py-0">
+                                    <span class="selected-text truncate">Mumbai, MH</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-brand-blue chevron ml-2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                                </button>
+                                <div class="dropdown-menu closed absolute top-full left-0 mt-2 md:mt-4 w-full md:w-56 bg-white rounded-2xl border border-gray-200 overflow-hidden z-50 p-2">
+                                    <div class="dropdown-item px-4 py-2 hover:bg-brand-light hover:text-brand-blue rounded-xl cursor-pointer transition-colors font-medium text-sm text-gray-600">Mumbai, MH</div>
+                                    <div class="dropdown-item px-4 py-2 hover:bg-brand-light hover:text-brand-blue rounded-xl cursor-pointer transition-colors font-medium text-sm text-gray-600">Bangalore, KA</div>
+                                    <div class="dropdown-item px-4 py-2 hover:bg-brand-light hover:text-brand-blue rounded-xl cursor-pointer transition-colors font-medium text-sm text-gray-600">Delhi NCR</div>
+                                    <div class="dropdown-item px-4 py-2 hover:bg-brand-light hover:text-brand-blue rounded-xl cursor-pointer transition-colors font-medium text-sm text-gray-600">Chennai, TN</div>
+                                    <div class="dropdown-item px-4 py-2 hover:bg-brand-light hover:text-brand-blue rounded-xl cursor-pointer transition-colors font-medium text-sm text-gray-600">Pune, MH</div>
+                                </div>
+                            </div>
+                            <!-- Dropdown 3: Price -->
+                            <div class="relative flex-1 px-2 md:px-4 w-full md:w-auto custom-dropdown pb-2 md:pb-0">
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Price Range</label>
+                                <button class="dropdown-trigger w-full text-left font-bold text-gray-800 bg-transparent flex justify-between items-center group py-2 md:py-0">
+                                    <span class="selected-text truncate">₹80L - ₹1.5 Cr</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-brand-blue chevron ml-2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                                </button>
+                                <div class="dropdown-menu closed absolute top-full left-0 mt-2 md:mt-4 w-full md:w-56 bg-white rounded-2xl border border-gray-200 overflow-hidden z-50 p-2">
+                                    <div class="dropdown-item px-4 py-2 hover:bg-brand-light hover:text-brand-blue rounded-xl cursor-pointer transition-colors font-medium text-sm text-gray-600">₹80L - ₹1.5 Cr</div>
+                                    <div class="dropdown-item px-4 py-2 hover:bg-brand-light hover:text-brand-blue rounded-xl cursor-pointer transition-colors font-medium text-sm text-gray-600">₹1.5 Cr - ₹5 Cr</div>
+                                    <div class="dropdown-item px-4 py-2 hover:bg-brand-light hover:text-brand-blue rounded-xl cursor-pointer transition-colors font-medium text-sm text-gray-600">₹5 Cr +</div>
+                                </div>
+                            </div>
+                            <button onclick="navigateTo('listings')" class="bg-brand-blue text-white px-8 py-3 md:py-4 rounded-full font-bold hover:bg-brand-blue-dark transition-colors w-full md:w-auto shadow-lg shadow-blue-200 mt-2 md:mt-0">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="border-y border-blue-100 py-12 mb-24 bg-brand-light">
+                <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center md:text-left">
+                    <div><p class="text-blue-500 text-sm font-medium mb-1">Happy Families</p><h4 class="text-3xl md:text-4xl font-bold text-brand-dark">6,675+</h4></div>
+                    <div><p class="text-blue-500 text-sm font-medium mb-1">Cities Covered</p><h4 class="text-3xl md:text-4xl font-bold text-brand-dark">12+</h4></div>
+                    <div><p class="text-blue-500 text-sm font-medium mb-1">Sold Properties</p><h4 class="text-3xl md:text-4xl font-bold text-brand-dark">2,050+</h4></div>
+                    <div><p class="text-blue-500 text-sm font-medium mb-1">Top Agents</p><h4 class="text-3xl md:text-4xl font-bold text-brand-dark">300+</h4></div>
+                </div>
+            </div>
+            
+            <!-- Popular Neighborhoods -->
+            <div class="max-w-7xl mx-auto px-6 mb-24 relative z-0">
+                <div class="flex justify-between items-end mb-8">
+                    <h2 class="text-3xl font-bold text-brand-dark">Explore Popular Cities</h2>
+                    <button onclick="navigateTo('listings')" class="text-brand-blue font-semibold text-sm hover:underline">View All Locations</button>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="relative h-64 rounded-3xl overflow-hidden cursor-pointer group" onclick="navigateTo('listings')">
+                        <img src="https://images.unsplash.com/photo-1570168007204-dfb528c6958f?q=80&w=2535&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Mumbai">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-white"><h3 class="font-bold text-lg">Mumbai</h3><p class="text-xs text-gray-300">250+ Properties</p></div>
+                    </div>
+                    <div class="relative h-64 rounded-3xl overflow-hidden cursor-pointer group" onclick="navigateTo('listings')">
+                        <img src="https://images.unsplash.com/photo-1596176530529-78163a4f7af2?q=80&w=2727&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Bangalore">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-white"><h3 class="font-bold text-lg">Bangalore</h3><p class="text-xs text-gray-300">180+ Properties</p></div>
+                    </div>
+                    <div class="relative h-64 rounded-3xl overflow-hidden cursor-pointer group" onclick="navigateTo('listings')">
+                        <img src="https://images.unsplash.com/photo-1517330357046-3ab5a5dd42a1?q=80&w=2670&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Delhi">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-white"><h3 class="font-bold text-lg">Delhi NCR</h3><p class="text-xs text-gray-300">300+ Properties</p></div>
+                    </div>
+                    <div class="relative h-64 rounded-3xl overflow-hidden cursor-pointer group" onclick="navigateTo('listings')">
+                        <img src="https://images.unsplash.com/photo-1616843413587-9e3a37f7bbd8?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Chennai">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-white"><h3 class="font-bold text-lg">Chennai</h3><p class="text-xs text-gray-300">120+ Properties</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="max-w-7xl mx-auto px-6 mb-24">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                     <div class="text-center md:text-left p-6 rounded-3xl hover:bg-brand-light transition-colors border border-transparent hover:border-blue-100">
+                        <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-brand-blue mb-6 mx-auto md:mx-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Verified Properties</h3><p class="text-gray-500 text-sm leading-relaxed">Every listing is physically verified by our team to ensure you get exactly what you see.</p>
+                     </div>
+                     <div class="text-center md:text-left p-6 rounded-3xl hover:bg-brand-light transition-colors border border-transparent hover:border-blue-100">
+                        <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-brand-blue mb-6 mx-auto md:mx-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Fast Documentation</h3><p class="text-gray-500 text-sm leading-relaxed">Our legal experts handle all the paperwork, making the registration process 3x faster.</p>
+                     </div>
+                     <div class="text-center md:text-left p-6 rounded-3xl hover:bg-brand-light transition-colors border border-transparent hover:border-blue-100">
+                        <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-brand-blue mb-6 mx-auto md:mx-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">24/7 Support</h3><p class="text-gray-500 text-sm leading-relaxed">Dedicated relationship managers available round the clock to answer your queries.</p>
+                     </div>
+                </div>
+            </div>
+
+            <!-- Best Residences -->
+            <div class="max-w-7xl mx-auto px-6 mb-24">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+                    <h2 class="text-3xl md:text-4xl font-bold max-w-md text-brand-dark">Best Residences For You</h2>
+                    <p class="text-gray-500 max-w-xs text-sm hidden md:block">Real estate is property consisting of land and the buildings on it, along with its natural resources.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="property-card bg-white rounded-3xl p-3 border border-gray-100 cursor-pointer" onclick="navigateTo('listings')">
+                        <div class="relative h-64 rounded-2xl overflow-hidden mb-4">
+                            <img src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=2671&auto=format&fit=crop" class="w-full h-full object-cover" alt="Classic House">
+                            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-brand-dark shadow-sm">For Sale</div>
+                        </div>
+                        <div class="px-2 pb-2">
+                            <div class="flex justify-between items-start mb-2"><h3 class="font-bold text-lg text-brand-dark">Indiranagar Villa</h3><span class="text-brand-blue font-bold">₹4.2 Cr</span></div>
+                            <div class="flex gap-4 text-xs text-gray-500 font-medium"><span>4 BHK</span><span>•</span><span>4 Baths</span><span>•</span><span>2850 sqft</span></div>
+                        </div>
+                    </div>
+                    <div class="property-card bg-white rounded-3xl p-3 border border-gray-100 cursor-pointer" onclick="navigateTo('listings')">
+                        <div class="relative h-64 rounded-2xl overflow-hidden mb-4">
+                            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2653&auto=format&fit=crop" class="w-full h-full object-cover" alt="Luxury Villa">
+                            <div class="absolute top-4 left-4 bg-brand-blue text-white backdrop-blur px-3 py-1 rounded-full text-xs font-bold shadow-lg shadow-blue-200">New Launch</div>
+                        </div>
+                        <div class="px-2 pb-2">
+                            <div class="flex justify-between items-start mb-2"><h3 class="font-bold text-lg text-brand-dark">Worli Sea Face</h3><span class="text-brand-blue font-bold">₹12.5 Cr</span></div>
+                            <div class="flex gap-4 text-xs text-gray-500 font-medium"><span>5 BHK</span><span>•</span><span>5 Baths</span><span>•</span><span>4500 sqft</span></div>
+                        </div>
+                    </div>
+                    <div class="property-card bg-white rounded-3xl p-3 border border-gray-100 cursor-pointer" onclick="navigateTo('listings')">
+                        <div class="relative h-64 rounded-2xl overflow-hidden mb-4">
+                            <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2670&auto=format&fit=crop" class="w-full h-full object-cover" alt="Garden House">
+                            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-brand-dark shadow-sm">Hot Deal</div>
+                        </div>
+                        <div class="px-2 pb-2">
+                            <div class="flex justify-between items-start mb-2"><h3 class="font-bold text-lg text-brand-dark">Bandra West Apt</h3><span class="text-brand-blue font-bold">₹8.5 Cr</span></div>
+                            <div class="flex gap-4 text-xs text-gray-500 font-medium"><span>3 BHK</span><span>•</span><span>3 Baths</span><span>•</span><span>1800 sqft</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Partners -->
+            <div class="bg-brand-gray py-12 mb-24">
+                <div class="max-w-7xl mx-auto px-6 text-center">
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-8">Trusted Banking & Construction Partners</p>
+                    <div class="flex flex-wrap justify-center gap-8 md:gap-16 opacity-50 grayscale">
+                         <span class="text-2xl font-black text-gray-800">HDFC</span>
+                         <span class="text-2xl font-black text-gray-800">SBI</span>
+                         <span class="text-2xl font-black text-gray-800">DLF</span>
+                         <span class="text-2xl font-black text-gray-800">GODREJ</span>
+                         <span class="text-2xl font-black text-gray-800">PRESTIGE</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PAGE 2: LISTINGS ==================== -->
+        <section id="listings" class="view-section">
+            <div class="max-w-7xl mx-auto px-6 py-12">
+                <div class="text-center mb-16">
+                    <span class="bg-brand-light text-brand-blue-dark px-4 py-1.5 rounded-full text-sm font-bold tracking-wide uppercase">Our Properties</span>
+                    <h2 class="text-3xl md:text-5xl font-bold mt-6 mb-4 text-brand-dark">Explore Premium Living Spaces</h2>
+                    <p class="text-gray-500 max-w-xl mx-auto">Discover a wide range of properties curated to meet your lifestyle and budget needs across India.</p>
+                </div>
+                <div class="flex justify-center gap-3 mb-12 flex-wrap">
+                    <button class="px-6 py-2 bg-brand-dark text-white rounded-full text-sm font-semibold shadow-lg shadow-gray-200">All</button>
+                    <button class="px-6 py-2 bg-white border border-gray-100 text-gray-600 hover:bg-brand-light hover:text-brand-blue rounded-full text-sm font-semibold transition-colors">Villas</button>
+                    <button class="px-6 py-2 bg-white border border-gray-100 text-gray-600 hover:bg-brand-light hover:text-brand-blue rounded-full text-sm font-semibold transition-colors">Apartments</button>
+                    <button class="px-6 py-2 bg-white border border-gray-100 text-gray-600 hover:bg-brand-light hover:text-brand-blue rounded-full text-sm font-semibold transition-colors">Penthouses</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                     <div class="property-card bg-white rounded-3xl p-3 border border-gray-100 cursor-pointer group">
+                        <div class="relative h-72 rounded-2xl overflow-hidden mb-4">
+                            <img src="https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?q=80&w=2670&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Listing">
+                            <div class="absolute bottom-4 right-4 bg-brand-dark text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">₹18.5 Cr</div>
+                        </div>
+                        <div class="px-2">
+                            <h3 class="font-bold text-xl mb-1 text-brand-dark">The Summit Ridge</h3>
+                            <p class="text-gray-500 text-sm mb-4">Oberoi Springs, Andheri West, Mumbai</p>
+                            <div class="flex justify-between border-t border-gray-100 pt-4 text-sm font-medium text-gray-600"><span>5 BHK</span><span>5 Baths</span><span>4200 sqft</span></div>
+                        </div>
+                    </div>
+                    <div class="property-card bg-white rounded-3xl p-3 border border-gray-100 cursor-pointer group">
+                        <div class="relative h-72 rounded-2xl overflow-hidden mb-4">
+                            <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=2670&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Listing">
+                            <div class="absolute bottom-4 right-4 bg-brand-dark text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">₹9.2 Cr</div>
+                        </div>
+                        <div class="px-2">
+                            <h3 class="font-bold text-xl mb-1 text-brand-dark">Crystal Park Estate</h3>
+                            <p class="text-gray-500 text-sm mb-4">Koramangala 3rd Block, Bangalore</p>
+                            <div class="flex justify-between border-t border-gray-100 pt-4 text-sm font-medium text-gray-600"><span>4 BHK</span><span>4 Baths</span><span>3500 sqft</span></div>
+                        </div>
+                    </div>
+                    <div class="property-card bg-white rounded-3xl p-3 border border-gray-100 cursor-pointer group">
+                        <div class="relative h-72 rounded-2xl overflow-hidden mb-4">
+                            <img src="https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?q=80&w=2592&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Listing">
+                            <div class="absolute bottom-4 right-4 bg-brand-dark text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">₹5.5 Cr</div>
+                        </div>
+                        <div class="px-2">
+                            <h3 class="font-bold text-xl mb-1 text-brand-dark">Willow Heights</h3>
+                            <p class="text-gray-500 text-sm mb-4">Gachibowli, Hyderabad</p>
+                            <div class="flex justify-between border-t border-gray-100 pt-4 text-sm font-medium text-gray-600"><span>3 BHK</span><span>3 Baths</span><span>2400 sqft</span></div>
+                        </div>
+                    </div>
+                    <div class="property-card bg-white rounded-3xl p-3 border border-gray-100 cursor-pointer group">
+                        <div class="relative h-72 rounded-2xl overflow-hidden mb-4">
+                            <img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?q=80&w=2670&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Listing">
+                            <div class="absolute bottom-4 right-4 bg-brand-dark text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">₹22 Cr</div>
+                        </div>
+                        <div class="px-2">
+                            <h3 class="font-bold text-xl mb-1 text-brand-dark">Lutyens Manor</h3>
+                            <p class="text-gray-500 text-sm mb-4">Aurangzeb Road, New Delhi</p>
+                            <div class="flex justify-between border-t border-gray-100 pt-4 text-sm font-medium text-gray-600"><span>6 BHK</span><span>7 Baths</span><span>6000 sqft</span></div>
+                        </div>
+                    </div>
+                     <div class="property-card bg-white rounded-3xl p-3 border border-gray-100 cursor-pointer group">
+                        <div class="relative h-72 rounded-2xl overflow-hidden mb-4">
+                            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2670&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Listing">
+                            <div class="absolute bottom-4 right-4 bg-brand-dark text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">₹3.8 Cr</div>
+                        </div>
+                        <div class="px-2">
+                            <h3 class="font-bold text-xl mb-1 text-brand-dark">Skyline Towers</h3>
+                            <p class="text-gray-500 text-sm mb-4">Salt Lake City, Kolkata</p>
+                            <div class="flex justify-between border-t border-gray-100 pt-4 text-sm font-medium text-gray-600"><span>3 BHK</span><span>3 Baths</span><span>1950 sqft</span></div>
+                        </div>
+                    </div>
+                    <div class="property-card bg-white rounded-3xl p-3 border border-gray-100 cursor-pointer group">
+                        <div class="relative h-72 rounded-2xl overflow-hidden mb-4">
+                            <img src="https://images.unsplash.com/photo-1510798831971-661eb04b3739?q=80&w=2574&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Listing">
+                            <div class="absolute bottom-4 right-4 bg-brand-dark text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">₹14.5 Cr</div>
+                        </div>
+                        <div class="px-2">
+                            <h3 class="font-bold text-xl mb-1 text-brand-dark">Oceanic Pearl</h3>
+                            <p class="text-gray-500 text-sm mb-4">Marine Drive, Mumbai</p>
+                            <div class="flex justify-between border-t border-gray-100 pt-4 text-sm font-medium text-gray-600"><span>4 BHK</span><span>4 Baths</span><span>3200 sqft</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-16">
+                    <button class="border border-gray-300 px-8 py-3 rounded-full text-sm font-bold hover:bg-brand-dark hover:text-white transition-colors">Load More Properties</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== NEW PAGE: PROJECTS ==================== -->
+        <section id="projects" class="view-section">
+            <div class="max-w-7xl mx-auto px-6 py-12">
+                <div class="text-center mb-16">
+                    <span class="bg-brand-light text-brand-blue-dark px-4 py-1.5 rounded-full text-sm font-bold tracking-wide uppercase">New Developments</span>
+                    <h2 class="text-3xl md:text-5xl font-bold mt-6 mb-4 text-brand-dark">Exclusive Projects</h2>
+                    <p class="text-gray-500 max-w-xl mx-auto">Discover master-planned communities and landmark developments redefining urban living.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Project 1 -->
+                    <div class="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-shadow group">
+                        <div class="relative h-80 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=2670&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Royal Palms">
+                            <div class="absolute top-4 left-4 bg-brand-dark text-white px-3 py-1 rounded-full text-xs font-bold">Under Construction</div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2 text-brand-dark">The Royal Palms</h3>
+                            <p class="text-gray-500 text-sm mb-4">Worli, Mumbai</p>
+                            <p class="text-gray-600 text-sm mb-6 line-clamp-3">A collection of ultra-luxury sky villas offering panoramic sea views, private elevators, and world-class amenities in the heart of South Mumbai.</p>
+                            <button onclick="navigateTo('project-detail-1')" class="w-full border border-brand-blue text-brand-blue font-bold py-3 rounded-xl hover:bg-brand-blue hover:text-white transition-colors">View Details</button>
+                        </div>
+                    </div>
+
+                    <!-- Project 2 -->
+                    <div class="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-shadow group">
+                        <div class="relative h-80 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?q=80&w=2670&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Serene Meadows">
+                            <div class="absolute top-4 left-4 bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold">Ready to Move</div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2 text-brand-dark">Serene Meadows</h3>
+                            <p class="text-gray-500 text-sm mb-4">Whitefield, Bangalore</p>
+                            <p class="text-gray-600 text-sm mb-6 line-clamp-3">Experience the tranquility of nature with our luxury villa community. Featuring 5 acres of open parks, a clubhouse, and premium lifestyle amenities.</p>
+                            <button onclick="navigateTo('project-detail-2')" class="w-full border border-brand-blue text-brand-blue font-bold py-3 rounded-xl hover:bg-brand-blue hover:text-white transition-colors">View Details</button>
+                        </div>
+                    </div>
+
+                    <!-- Project 3 -->
+                    <div class="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-shadow group">
+                        <div class="relative h-80 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=2670&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Capital Greens">
+                            <div class="absolute top-4 left-4 bg-brand-blue text-white px-3 py-1 rounded-full text-xs font-bold">New Launch</div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2 text-brand-dark">Capital Greens</h3>
+                            <p class="text-gray-500 text-sm mb-4">Dwarka Expressway, Delhi</p>
+                            <p class="text-gray-600 text-sm mb-6 line-clamp-3">Sustainable living meets modern luxury. Eco-friendly apartments with vertical gardens, solar power integration, and EV charging stations.</p>
+                            <button onclick="navigateTo('project-detail-3')" class="w-full border border-brand-blue text-brand-blue font-bold py-3 rounded-xl hover:bg-brand-blue hover:text-white transition-colors">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PROJECT DETAIL PAGE 1 ==================== -->
+        <section id="project-detail-1" class="view-section">
+            <div class="max-w-7xl mx-auto px-6 py-8">
+                <button onclick="navigateTo('projects')" class="flex items-center text-gray-500 hover:text-brand-dark mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg> Back to Projects
+                </button>
+                
+                <div class="relative h-[500px] rounded-3xl overflow-hidden mb-12">
+                    <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=2670&auto=format&fit=crop" class="w-full h-full object-cover" alt="Royal Palms Hero">
+                    <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-8 md:p-12">
+                        <h1 class="text-4xl md:text-6xl font-bold text-white mb-2">The Royal Palms</h1>
+                        <p class="text-xl text-gray-200">Worli, Mumbai</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <div class="md:col-span-2">
+                        <h2 class="text-2xl font-bold mb-4 text-brand-dark">About the Project</h2>
+                        <p class="text-gray-600 leading-relaxed mb-8">The Royal Palms defines the pinnacle of luxury living in South Mumbai. These exclusive sky villas offer an unparalleled lifestyle with breathtaking views of the Arabian Sea. Designed by internationally acclaimed architects, the project features expansive living spaces, private elevators opening directly into your apartment, and bespoke finishes.</p>
+                        
+                        <h2 class="text-2xl font-bold mb-4 text-brand-dark">Amenities</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> Infinity Pool</div>
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> Private Elevator</div>
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> Concierge Service</div>
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> Sea View Deck</div>
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> Sky Lounge</div>
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> Smart Home Automation</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-brand-gray p-8 rounded-3xl h-fit">
+                        <h3 class="text-xl font-bold mb-6 text-brand-dark">Project Details</h3>
+                        <div class="space-y-4 mb-8">
+                            <div class="flex justify-between border-b border-gray-200 pb-2"><span class="text-gray-500">Status</span><span class="font-bold">Under Construction</span></div>
+                            <div class="flex justify-between border-b border-gray-200 pb-2"><span class="text-gray-500">Possession</span><span class="font-bold">Dec 2026</span></div>
+                            <div class="flex justify-between border-b border-gray-200 pb-2"><span class="text-gray-500">Configuration</span><span class="font-bold">4 & 5 BHK</span></div>
+                            <div class="flex justify-between border-b border-gray-200 pb-2"><span class="text-gray-500">Price</span><span class="font-bold text-brand-blue">Starts ₹12 Cr</span></div>
+                        </div>
+                        <button class="w-full bg-brand-dark text-white py-4 rounded-xl font-bold hover:bg-brand-blue transition-colors">Enquire Now</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PROJECT DETAIL PAGE 2 ==================== -->
+        <section id="project-detail-2" class="view-section">
+            <div class="max-w-7xl mx-auto px-6 py-8">
+                <button onclick="navigateTo('projects')" class="flex items-center text-gray-500 hover:text-brand-dark mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg> Back to Projects
+                </button>
+                <div class="relative h-[500px] rounded-3xl overflow-hidden mb-12">
+                    <img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?q=80&w=2670&auto=format&fit=crop" class="w-full h-full object-cover" alt="Serene Meadows Hero">
+                    <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-8 md:p-12">
+                        <h1 class="text-4xl md:text-6xl font-bold text-white mb-2">Serene Meadows</h1>
+                        <p class="text-xl text-gray-200">Whitefield, Bangalore</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <div class="md:col-span-2">
+                        <h2 class="text-2xl font-bold mb-4 text-brand-dark">About the Project</h2>
+                        <p class="text-gray-600 leading-relaxed mb-8">Located in the IT hub of Bangalore, Serene Meadows offers a perfect escape from the city hustle without leaving it. Spread across 25 acres, this villa community focuses on green living with 60% open spaces. Each villa is designed with a private garden and terrace, ensuring privacy and luxury go hand in hand.</p>
+                        <h2 class="text-2xl font-bold mb-4 text-brand-dark">Amenities</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> 5 Acres Park</div>
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> Luxury Clubhouse</div>
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> Jogging Track</div>
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> Kids Play Area</div>
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> Swimming Pool</div>
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> 24/7 Security</div>
+                        </div>
+                    </div>
+                    <div class="bg-brand-gray p-8 rounded-3xl h-fit">
+                        <h3 class="text-xl font-bold mb-6 text-brand-dark">Project Details</h3>
+                        <div class="space-y-4 mb-8">
+                            <div class="flex justify-between border-b border-gray-200 pb-2"><span class="text-gray-500">Status</span><span class="font-bold">Ready to Move</span></div>
+                            <div class="flex justify-between border-b border-gray-200 pb-2"><span class="text-gray-500">Configuration</span><span class="font-bold">3 & 4 BHK Villas</span></div>
+                            <div class="flex justify-between border-b border-gray-200 pb-2"><span class="text-gray-500">Area</span><span class="font-bold">25 Acres</span></div>
+                            <div class="flex justify-between border-b border-gray-200 pb-2"><span class="text-gray-500">Price</span><span class="font-bold text-brand-blue">Starts ₹3.5 Cr</span></div>
+                        </div>
+                        <button class="w-full bg-brand-dark text-white py-4 rounded-xl font-bold hover:bg-brand-blue transition-colors">Enquire Now</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PROJECT DETAIL PAGE 3 ==================== -->
+        <section id="project-detail-3" class="view-section">
+            <div class="max-w-7xl mx-auto px-6 py-8">
+                <button onclick="navigateTo('projects')" class="flex items-center text-gray-500 hover:text-brand-dark mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg> Back to Projects
+                </button>
+                <div class="relative h-[500px] rounded-3xl overflow-hidden mb-12">
+                    <img src="https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=2670&auto=format&fit=crop" class="w-full h-full object-cover" alt="Capital Greens Hero">
+                    <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-8 md:p-12">
+                        <h1 class="text-4xl md:text-6xl font-bold text-white mb-2">Capital Greens</h1>
+                        <p class="text-xl text-gray-200">Dwarka Expressway, Delhi</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <div class="md:col-span-2">
+                        <h2 class="text-2xl font-bold mb-4 text-brand-dark">About the Project</h2>
+                        <p class="text-gray-600 leading-relaxed mb-8">Capital Greens is a futuristic residential complex designed for the modern, eco-conscious family. Located on the rapidly developing Dwarka Expressway, it boasts excellent connectivity to the airport and Gurgaon. The project emphasizes sustainability with solar power generation, rainwater harvesting, and integrated vertical gardens on every tower facade.</p>
+                        <h2 class="text-2xl font-bold mb-4 text-brand-dark">Amenities</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> Solar Power</div>
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> EV Charging Stations</div>
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> Vertical Gardens</div>
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> Co-working Space</div>
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> Sports Complex</div>
+                            <div class="flex items-center gap-2 text-gray-600"><span class="w-2 h-2 bg-brand-blue rounded-full"></span> Organic Farm</div>
+                        </div>
+                    </div>
+                    <div class="bg-brand-gray p-8 rounded-3xl h-fit">
+                        <h3 class="text-xl font-bold mb-6 text-brand-dark">Project Details</h3>
+                        <div class="space-y-4 mb-8">
+                            <div class="flex justify-between border-b border-gray-200 pb-2"><span class="text-gray-500">Status</span><span class="font-bold">New Launch</span></div>
+                            <div class="flex justify-between border-b border-gray-200 pb-2"><span class="text-gray-500">Possession</span><span class="font-bold">Mid 2027</span></div>
+                            <div class="flex justify-between border-b border-gray-200 pb-2"><span class="text-gray-500">Configuration</span><span class="font-bold">2 & 3 BHK</span></div>
+                            <div class="flex justify-between border-b border-gray-200 pb-2"><span class="text-gray-500">Price</span><span class="font-bold text-brand-blue">Starts ₹1.8 Cr</span></div>
+                        </div>
+                        <button class="w-full bg-brand-dark text-white py-4 rounded-xl font-bold hover:bg-brand-blue transition-colors">Enquire Now</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PAGE 3: SERVICES & AGENTS ==================== -->
+        <section id="services" class="view-section">
+            <div class="max-w-7xl mx-auto px-6 py-12">
+                
+                <!-- Process Timeline -->
+                <div class="mb-24 text-center">
+                    <span class="text-brand-blue font-bold uppercase tracking-widest text-xs mb-2 block">Our Process</span>
+                    <h2 class="text-3xl font-bold mb-12 text-brand-dark">Simple 3-Step Journey</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="relative">
+                            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-brand-blue font-bold text-xl mx-auto mb-6 border-4 border-white shadow-lg z-10 relative">1</div>
+                            <h3 class="font-bold text-lg mb-2">Search & Visit</h3>
+                            <p class="text-sm text-gray-500 px-8">Filter through our verified listings and schedule a physical visit with our agents.</p>
+                            <!-- Connector Line (Desktop) -->
+                            <div class="hidden md:block absolute top-8 left-1/2 w-full h-0.5 bg-gray-100 -z-0"></div>
+                        </div>
+                        <div class="relative">
+                            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-brand-blue font-bold text-xl mx-auto mb-6 border-4 border-white shadow-lg z-10 relative">2</div>
+                            <h3 class="font-bold text-lg mb-2">Paperwork & Loan</h3>
+                            <p class="text-sm text-gray-500 px-8">We handle the legal verification, negotiation, and assist with quick loan approvals.</p>
+                             <!-- Connector Line (Desktop) -->
+                            <div class="hidden md:block absolute top-8 left-1/2 w-full h-0.5 bg-gray-100 -z-0"></div>
+                        </div>
+                        <div class="relative">
+                            <div class="w-16 h-16 bg-brand-blue rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto mb-6 border-4 border-white shadow-lg z-10 relative">3</div>
+                            <h3 class="font-bold text-lg mb-2">Move In</h3>
+                            <p class="text-sm text-gray-500 px-8">Receive the keys to your new home and celebrate your new beginning!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center mb-32">
+                    <div>
+                        <span class="text-brand-blue font-bold uppercase tracking-widest text-xs mb-2 block">Our Services</span>
+                        <h2 class="text-4xl font-bold mb-6 text-brand-dark">How We Can Help You</h2>
+                        <div class="space-y-8">
+                            <!-- Service 1 -->
+                            <div class="flex gap-4">
+                                <div class="w-12 h-12 rounded-full bg-brand-light flex items-center justify-center flex-shrink-0 text-brand-blue">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg mb-2 text-brand-dark">Check Home Loan Eligibility</h3>
+                                    <p class="text-gray-500 text-sm leading-relaxed">We help you estimate your budget accurately with connections to top banks like HDFC, SBI, and ICICI.</p>
+                                </div>
+                            </div>
+
+                            <!-- Service 2 -->
+                            <div class="flex gap-4">
+                                <div class="w-12 h-12 rounded-full bg-brand-light flex items-center justify-center flex-shrink-0 text-brand-blue">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg mb-2 text-brand-dark">Understand Registration Costs</h3>
+                                    <p class="text-gray-500 text-sm leading-relaxed">Get a clear breakdown of Stamp Duty, GST, and registration charges in your state before you commit.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=2573&auto=format&fit=crop" class="rounded-3xl shadow-soft w-full" alt="Modern Architecture">
+                        <div class="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-floating max-w-xs hidden md:block border border-blue-50">
+                            <p class="text-sm font-bold mb-2 text-brand-dark">"Found my dream flat in Bandra in just 2 weeks!"</p>
+                            <div class="flex items-center gap-2">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-8 h-8 rounded-full" alt="User">
+                                <span class="text-xs text-gray-500">Priya Sharma, Mumbai</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonials & Client MVP -->
+                <div class="bg-brand-gray rounded-[3rem] p-8 md:p-24">
+                    <div class="text-center mb-16">
+                        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-brand-dark">What Our Clients Say?</h2>
+                        <div class="flex justify-center gap-1 text-brand-blue">
+                            ★★★★★
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                        <!-- Standard Testimonial 1 -->
+                        <div class="bg-white p-8 rounded-3xl shadow-sm">
+                            <p class="text-gray-600 text-sm mb-6 leading-relaxed">"We had the pleasure of working with Amit from the Houseland team and he was fantastic! Helped us navigate the paperwork seamlessly."</p>
+                            <div class="flex items-center gap-4">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-10 h-10 rounded-full" alt="Client">
+                                <div>
+                                    <h4 class="font-bold text-sm text-brand-dark">Rajesh Kumar</h4>
+                                    <p class="text-xs text-blue-500">IT Consultant</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Client MVP Card (Featured) -->
+                        <div class="bg-brand-dark p-8 rounded-3xl shadow-xl transform md:-translate-y-4 relative overflow-hidden group">
+                            <!-- Background Pattern/Image Overlay -->
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-brand-blue rounded-full filter blur-3xl opacity-20"></div>
+                            
+                            <div class="relative z-10">
+                                <div class="flex justify-between items-start mb-6">
+                                    <div class="bg-yellow-500 text-brand-dark text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full mvp-badge shadow-lg">Client MVP</div>
+                                    <div class="text-yellow-500 text-lg">★★★★★</div>
+                                </div>
+                                
+                                <h3 class="text-white text-xl font-bold mb-2">"A Dream Come True!"</h3>
+                                <p class="text-gray-300 text-sm mb-8 leading-relaxed italic">"We never thought we could afford a villa in South Bangalore. Houseland not only found us the perfect property but negotiated a price 15% below market rate. Truly the MVPs of real estate!"</p>
+                                
+                                <div class="flex items-center gap-4 pt-4 border-t border-gray-700">
+                                    <div class="relative">
+                                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=2588&auto=format&fit=crop" class="w-12 h-12 rounded-full border-2 border-yellow-500 object-cover" alt="Client MVP">
+                                        <div class="absolute -bottom-1 -right-1 bg-yellow-500 text-[10px] font-bold px-1.5 py-0.5 rounded text-black">SOLD</div>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-sm text-white">The Verma Family</h4>
+                                        <p class="text-xs text-yellow-500 font-medium">Proud Homeowners, Koramangala</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Standard Testimonial 3 -->
+                        <div class="bg-white p-8 rounded-3xl shadow-sm">
+                            <p class="text-gray-600 text-sm mb-6 leading-relaxed">"Professional, courteous, and efficient. They found us a pre-launch deal in Gurgaon that was exactly what we were looking for."</p>
+                            <div class="flex items-center gap-4">
+                                <img src="https://randomuser.me/api/portraits/men/85.jpg" class="w-10 h-10 rounded-full" alt="Client">
+                                <div>
+                                    <h4 class="font-bold text-sm text-brand-dark">Vikram Singh</h4>
+                                    <p class="text-xs text-blue-500">Entrepreneur</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PAGE 4: CONTACT & FOOTER ==================== -->
+        <section id="contact" class="view-section">
+            <div class="bg-brand-dark text-white min-h-screen flex flex-col justify-center relative">
+                
+                <div class="max-w-7xl mx-auto px-6 pt-24 pb-12 w-full">
+                    
+                    <!-- NEW: Agent Grid Section -->
+                    <div class="mb-24">
+                        <div class="flex justify-between items-end mb-12">
+                            <div>
+                                <span class="text-brand-blue font-bold tracking-widest uppercase text-sm mb-2 block">Our Team</span>
+                                <h2 class="text-3xl md:text-4xl font-bold">Meet Our Top Agents</h2>
+                            </div>
+                            <button class="hidden md:block text-sm border-b border-gray-600 pb-1 hover:text-brand-blue hover:border-brand-blue transition-colors">View All Agents</button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <!-- Agent 1 -->
+                            <div class="bg-white/5 border border-white/10 rounded-3xl p-4 hover:bg-white/10 transition-colors group">
+                                <div class="w-full aspect-square rounded-2xl overflow-hidden mb-4 relative">
+                                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=2574&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Agent">
+                                </div>
+                                <h3 class="font-bold text-lg">Amit Shah</h3>
+                                <p class="text-xs text-brand-blue mb-2">Luxury Specialist, Mumbai</p>
+                                <div class="flex justify-between items-center text-xs text-gray-400">
+                                    <span>50+ Deals Closed</span>
+                                    <span class="text-yellow-500">★ 4.9</span>
+                                </div>
+                            </div>
+                             <!-- Agent 2 -->
+                            <div class="bg-white/5 border border-white/10 rounded-3xl p-4 hover:bg-white/10 transition-colors group">
+                                <div class="w-full aspect-square rounded-2xl overflow-hidden mb-4 relative">
+                                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=2576&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Agent">
+                                </div>
+                                <h3 class="font-bold text-lg">Sneha Reddy</h3>
+                                <p class="text-xs text-brand-blue mb-2">Commercial Expert, Bangalore</p>
+                                <div class="flex justify-between items-center text-xs text-gray-400">
+                                    <span>35+ Deals Closed</span>
+                                    <span class="text-yellow-500">★ 5.0</span>
+                                </div>
+                            </div>
+                             <!-- Agent 3 -->
+                            <div class="bg-white/5 border border-white/10 rounded-3xl p-4 hover:bg-white/10 transition-colors group">
+                                <div class="w-full aspect-square rounded-2xl overflow-hidden mb-4 relative">
+                                    <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=2574&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Agent">
+                                </div>
+                                <h3 class="font-bold text-lg">Rohan Das</h3>
+                                <p class="text-xs text-brand-blue mb-2">Rental Manager, Delhi NCR</p>
+                                <div class="flex justify-between items-center text-xs text-gray-400">
+                                    <span>120+ Rentals</span>
+                                    <span class="text-yellow-500">★ 4.8</span>
+                                </div>
+                            </div>
+                             <!-- Agent 4 -->
+                            <div class="bg-white/5 border border-white/10 rounded-3xl p-4 hover:bg-white/10 transition-colors group">
+                                <div class="w-full aspect-square rounded-2xl overflow-hidden mb-4 relative">
+                                    <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=2561&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Agent">
+                                </div>
+                                <h3 class="font-bold text-lg">Priya Menon</h3>
+                                <p class="text-xs text-brand-blue mb-2">Villa Specialist, Kerala</p>
+                                <div class="flex justify-between items-center text-xs text-gray-400">
+                                    <span>25+ Villas Sold</span>
+                                    <span class="text-yellow-500">★ 4.9</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                        <div>
+                            <span class="text-brand-blue font-bold tracking-widest uppercase text-sm mb-4 block">Ready to Work With Us?</span>
+                            <h2 class="text-4xl md:text-7xl font-bold mb-8 leading-tight">Let's Find Your <br> Dream Place.</h2>
+                            <p class="text-gray-400 max-w-md mb-12 text-lg">We have helped thousands of families across India find their perfect home. Join our network today.</p>
+                            
+                            <div class="flex gap-8 text-sm font-semibold text-gray-300">
+                                <div>
+                                    <p class="text-white mb-2">Head Office</p>
+                                    <p>DLF Cyber City, Phase 2<br>Gurugram, Haryana 122002</p>
+                                </div>
+                                <div>
+                                    <p class="text-white mb-2">Contact</p>
+                                    <p>namaste@houseland.in<br>+91 98765 43210</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/5 p-8 md:p-12 rounded-[2.5rem] backdrop-blur-sm border border-white/10 shadow-2xl">
+                            <form class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <input type="text" placeholder="First Name" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder-gray-400 focus:outline-none focus:border-brand-blue transition-colors focus:bg-white/10">
+                                    <input type="text" placeholder="Last Name" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder-gray-400 focus:outline-none focus:border-brand-blue transition-colors focus:bg-white/10">
+                                </div>
+                                <input type="email" placeholder="Email Address" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder-gray-400 focus:outline-none focus:border-brand-blue transition-colors focus:bg-white/10">
+                                <textarea rows="4" placeholder="How can we help you?" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder-gray-400 focus:outline-none focus:border-brand-blue transition-colors focus:bg-white/10"></textarea>
+                                
+                                <button class="w-full bg-brand-blue text-white py-4 rounded-xl font-bold text-lg hover:bg-brand-blue-dark transition-colors shadow-lg shadow-blue-900/50">Send Message</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="mt-24 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+                        <p>&copy; 2025 Houseland Realty India Pvt Ltd. All rights reserved.</p>
+                        <div class="flex gap-6 mt-4 md:mt-0">
+                            <a href="#" class="hover:text-white transition-colors">Instagram</a>
+                            <a href="#" class="hover:text-white transition-colors">Twitter</a>
+                            <a href="#" class="hover:text-white transition-colors">Facebook</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating Contact Buttons -->
+    <div class="fixed bottom-6 right-6 flex flex-col gap-4 z-50">
+        <!-- WhatsApp Button -->
+        <a href="https://wa.me/919876543210" target="_blank" class="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-green-500/30 hover:bg-green-600 transition-all hover:scale-110 group relative">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-7 h-7" viewBox="0 0 16 16">
+                <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+            </svg>
+            <!-- Tooltip -->
+            <span class="absolute right-full mr-3 bg-white text-black text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap invisible group-hover:visible">Chat on WhatsApp</span>
+        </a>
+        
+        <!-- Call Button -->
+        <a href="tel:+919876543210" class="w-14 h-14 bg-brand-blue rounded-full flex items-center justify-center text-white shadow-lg shadow-blue-500/30 hover:bg-brand-blue-dark transition-all hover:scale-110 group relative">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+            </svg>
+             <!-- Tooltip -->
+            <span class="absolute right-full mr-3 bg-white text-black text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap invisible group-hover:visible">Call Now</span>
+        </a>
+    </div>
+
+    <!-- Script to handle Navigation (SPA logic) & Dropdown Logic -->
+    <script>
+        function navigateTo(pageId) {
+            // 1. Hide all views
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // 2. Show target view
+            const target = document.getElementById(pageId);
+            if(target) {
+                target.classList.add('active');
+                window.scrollTo(0,0);
+            }
+
+            // 3. Update active nav pill
+            document.querySelectorAll('.nav-pill').forEach(btn => {
+                btn.classList.remove('active', 'bg-black', 'text-white');
+                btn.classList.add('text-gray-600'); // Reset style
+                
+                // Logic to match button text to pageId
+                // Special check for 'project-detail' pages to keep 'Projects' active
+                const isProjectDetail = pageId.startsWith('project-detail');
+                const btnText = btn.textContent.toLowerCase();
+                
+                if(btnText.includes(pageId) || (pageId === 'contact' && btnText === 'agents') || (isProjectDetail && btnText === 'projects')) {
+                     // Add active style
+                     btn.classList.add('active');
+                     btn.classList.remove('text-gray-600');
+                }
+            });
+        }
+
+        // Dropdown Logic
+        document.addEventListener('DOMContentLoaded', () => {
+           navigateTo('home'); 
+
+           // Handle dropdowns
+           const dropdowns = document.querySelectorAll('.custom-dropdown');
+           
+           dropdowns.forEach(dropdown => {
+               const trigger = dropdown.querySelector('.dropdown-trigger');
+               const menu = dropdown.querySelector('.dropdown-menu');
+               const options = dropdown.querySelectorAll('.dropdown-item');
+               const selectedText = dropdown.querySelector('.selected-text');
+
+               // Toggle menu
+               trigger.addEventListener('click', (e) => {
+                   e.stopPropagation();
+                   // Close all other dropdowns first
+                   dropdowns.forEach(d => {
+                       if(d !== dropdown) {
+                           d.querySelector('.dropdown-menu').classList.remove('open');
+                           d.querySelector('.dropdown-menu').classList.add('closed');
+                           d.querySelector('.dropdown-trigger').classList.remove('active');
+                       }
+                   });
+
+                   // Toggle current
+                   const isOpen = menu.classList.contains('open');
+                   if(isOpen) {
+                       menu.classList.remove('open');
+                       menu.classList.add('closed');
+                       trigger.classList.remove('active');
+                   } else {
+                       menu.classList.remove('closed');
+                       menu.classList.add('open');
+                       trigger.classList.add('active');
+                   }
+               });
+
+               // Handle option selection
+               options.forEach(option => {
+                   option.addEventListener('click', (e) => {
+                       e.stopPropagation();
+                       selectedText.textContent = option.textContent;
+                       menu.classList.remove('open');
+                       menu.classList.add('closed');
+                       trigger.classList.remove('active');
+                   });
+               });
+           });
+
+           // Close when clicking outside
+           document.addEventListener('click', () => {
+               dropdowns.forEach(d => {
+                   const menu = d.querySelector('.dropdown-menu');
+                   const trigger = d.querySelector('.dropdown-trigger');
+                   menu.classList.remove('open');
+                   menu.classList.add('closed');
+                   trigger.classList.remove('active');
+               });
+           });
+        });
+    </script>
+</body>
+</html>
